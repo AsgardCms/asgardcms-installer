@@ -1,0 +1,28 @@
+{
+  "name": "asgardcms/asgardcms-installer",
+  "description": "AsgardCms application installer.",
+  "keywords": [
+    "laravel",
+    "asgardcms"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Nicolas Widart",
+      "email": "n.widart@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "AsgardCms\\Installer\\Console\\": "src/"
+    }
+  },
+  "require": {
+    "guzzlehttp/guzzle": "~4.0|~5.0",
+    "symfony/console": "~2.7",
+    "symfony/process": "~2.7"
+  },
+  "bin": [
+    "asgardcms"
+  ]
+}
