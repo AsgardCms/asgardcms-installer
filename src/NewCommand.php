@@ -11,6 +11,12 @@ use ZipArchive;
 class NewCommand extends Command
 {
     /**
+     * Current version of AsgardCms
+     * @var string
+     */
+    private $version = '1.0.2';
+
+    /**
      * Configure the command options.
      */
     protected function configure()
@@ -67,7 +73,7 @@ class NewCommand extends Command
      */
     protected function download($zipFile)
     {
-        $response = (new Client)->get('https://github.com/AsgardCms/Platform/archive/1.0.2.zip');
+        $response = (new Client)->get("https://github.com/AsgardCms/Platform/archive/{$this->version}.zip");
         file_put_contents($zipFile, $response->getBody());
 
         return $this;
@@ -84,6 +90,7 @@ class NewCommand extends Command
         $archive = new ZipArchive;
         $archive->open($zipFile);
         $archive->extractTo($directory);
+        $this->recursiveCopy("$directory/Platform-{$this->version}", $directory);
         $archive->close();
 
         return $this;
@@ -100,5 +107,26 @@ class NewCommand extends Command
         @unlink($zipFile);
 
         return $this;
+    }
+
+    /**
+     * Recursivaly move the source to destination
+     * @param string $source
+     * @param string $destination
+     */
+    public function recursiveCopy($source, $destination) {
+        $dir = opendir($source);
+        @mkdir($destination);
+        while(false !== ( $file = readdir($dir)) ) {
+            if (( $file != '.' ) && ( $file != '..' )) {
+                if ( is_dir($source . '/' . $file) ) {
+                    $this->recursiveCopy($source . '/' . $file,$destination . '/' . $file);
+                }
+                else {
+                    copy($source . '/' . $file,$destination . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
     }
 }
