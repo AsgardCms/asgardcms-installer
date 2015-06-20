@@ -114,16 +114,16 @@ class NewCommand extends Command
      * @param string $source
      * @param string $destination
      */
-    public function recursiveCopy($source, $destination) {
+    public function recursiveCopy($source, $destination)
+    {
         $dir = opendir($source);
         @mkdir($destination);
-        while(false !== ( $file = readdir($dir)) ) {
-            if (( $file != '.' ) && ( $file != '..' )) {
-                if ( is_dir($source . '/' . $file) ) {
-                    $this->recursiveCopy($source . '/' . $file,$destination . '/' . $file);
-                }
-                else {
-                    copy($source . '/' . $file,$destination . '/' . $file);
+        while (false !== ($file = readdir($dir))) {
+            if (($file != '.') && ($file != '..')) {
+                if (is_dir($source . '/' . $file)) {
+                    $this->recursiveCopy($source . '/' . $file, $destination . '/' . $file);
+                } else {
+                    copy($source . '/' . $file, $destination . '/' . $file);
                 }
             }
         }
