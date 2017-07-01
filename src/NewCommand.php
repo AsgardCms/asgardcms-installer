@@ -3,6 +3,7 @@
 use GuzzleHttp\Client;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -41,7 +42,7 @@ class NewCommand extends Command
 
         $output->writeln('<info>Crafting application...</info>');
 
-        $this->download($zipFile = $this->makeFilename(), $directory)
+        $this->download($zipFile = $this->makeFilename(), $output)
             ->extract($zipFile, $directory)
             ->cleanUp($zipFile);
 
@@ -88,9 +89,10 @@ class NewCommand extends Command
     /**
      * Download the temporary Zip to the given file.
      * @param  string $zipFile
+     * @param OutputInterface $output
      * @return $this
      */
-    protected function download($zipFile, $dir)
+    protected function download($zipFile, OutputInterface $output)
     {
         $client = new Client([
             'base_uri' => 'https://api.github.com',
@@ -99,8 +101,17 @@ class NewCommand extends Command
 
         $latestVersionUrl = $this->getLatestVersionUrl($client);
 
-        $response = (new Client)->get($latestVersionUrl);
+        $progress = new ProgressBar($output);
+        $progress->setFormat('verbose');
+
+        $response = (new Client)->get($latestVersionUrl, [
+            'progress' => function($downloadTotal, $downloadedBytes, $uploadTotal, $uploadedBytes) use ($progress) {
+                $progress->advance();
+            },
+        ]);
         file_put_contents($zipFile, $response->getBody());
+
+        $progress->finish();
 
         return $this;
     }
