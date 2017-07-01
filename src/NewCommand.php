@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\Process;
 use ZipArchive;
 
 class NewCommand extends Command
@@ -28,6 +29,8 @@ class NewCommand extends Command
      * @param  InputInterface $input
      * @param  OutputInterface $output
      * @return void
+     * @throws \Symfony\Component\Process\Exception\LogicException
+     * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -41,6 +44,22 @@ class NewCommand extends Command
         $this->download($zipFile = $this->makeFilename(), $directory)
             ->extract($zipFile, $directory)
             ->cleanUp($zipFile);
+
+        $composer = $this->findComposer();
+
+        $commands = [
+            $composer.' install --no-scripts',
+            $composer.' run-script post-install-cmd',
+        ];
+
+        $process = new Process(implode(' && ', $commands), $directory, null, null, null);
+        if ('\\' !== DIRECTORY_SEPARATOR && file_exists('/dev/tty') && is_readable('/dev/tty')) {
+            $process->setTty(true);
+        }
+        $process->run(function ($type, $line) use ($output) {
+            $output->write($line);
+        });
+
         $output->writeln('<comment>Application ready! Build something amazing.</comment>');
     }
 
@@ -131,5 +150,18 @@ class NewCommand extends Command
         @unlink($zipFile);
 
         return $this;
+    }
+
+    /**
+     * Get the composer command for the environment.
+     *
+     * @return string
+     */
+    protected function findComposer()
+    {
+        if (file_exists(getcwd().'/composer.phar')) {
+            return '"'.PHP_BINARY.'" composer.phar';
+        }
+        return 'composer';
     }
 }
