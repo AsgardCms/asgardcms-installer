@@ -46,6 +46,7 @@ class NewCommand extends Command
             ->extract($zipFile, $directory)
             ->cleanUp($zipFile);
 
+        $output->writeln('<comment></comment>');
         $composer = $this->findComposer();
 
         $commands = [
@@ -102,7 +103,7 @@ class NewCommand extends Command
         $latestVersionUrl = $this->getLatestVersionUrl($client);
 
         $progress = new ProgressBar($output);
-        $progress->setFormat('verbose');
+        $progress->setFormat('[%bar%] %elapsed:6s%');
 
         $response = (new Client)->get($latestVersionUrl, [
             'progress' => function($downloadTotal, $downloadedBytes, $uploadTotal, $uploadedBytes) use ($progress) {
