@@ -25,5 +25,7 @@
   },
   "bin": [
     "asgardcms"
-  ]
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
