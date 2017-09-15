@@ -25,4 +25,5 @@ asgardcms new Blog
 
 ## License
 
-[MIT License](#LICENSE.md)
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+
