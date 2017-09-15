@@ -21,3 +21,8 @@ Once installed, the `asgardcms new` command will create a fresh AsgardCMS instal
 ```bash
 asgardcms new Blog
 ```
+
+
+## License
+
+[MIT License](#LICENSE.md)
